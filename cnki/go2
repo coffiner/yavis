@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cat link | while read line
+do
+	curl -L -b $TMP/cookie -e $qlink$i $link -o a
+done
+
+exit 0
+

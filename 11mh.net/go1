@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# made of `cURL`
+
+. ./conf1
+
+CURL="/usr/bin/curl -sSL -c /tmp/cookie -b /tmp/cookie"
+URLSIGN="http://www.11mh.net/plugin.php?id=dsu_paulsign:sign"
+URLSUF="&inajax=1"
+
+echo > /tmp/cookie
+
+$CURL "http://www.11mh.net/member.php?mod=logging&action=login" -o /tmp/11mh
+LOGINHASH=`grep -m 1 -Po "(?<=username_)\w+(?=\")" /tmp/11mh`
+FORMHASH=`grep -m 1 -Po "(?<=formhash=).*?(?=\&)" /tmp/11mh`
+
+$CURL \
+	-d formhash=$FORMHASH \
+	-d referer=$URLSIGN \
+	-d username=$USER11 \
+	-d password=$PASS11 \
+	-d questionid=0 \
+	-d answer= \
+	"http://www.11mh.net/member.php?mod=logging&action=login&loginsubmit=yes&loginhash="$LOGINHASH$URLSUF \
+| grep -Po "(?<=欢迎您回来，).*?(?=，现在将转入登录前页面)"
+
+$CURL $URLSIGN -o /tmp/11mh
+FORMHASH=`grep -m 1 -Po "(?<=formhash=).*?(?=\&)" /tmp/11mh`
+
+$CURL \
+	-d formhash=$FORMHASH \
+	-d qdxq=kx \
+	-d qdmode=2 \
+	-d todaysay= \
+	-d fastreply=0 \
+	$URLSIGN"&operation=qiandao&infloat=1"$URLSUF -o /tmp/11mh
+
+grep -Po "敏捷.*?(?=\.)" /tmp/11mh || grep -Po "您今日已经签到，请明天再来！" /tmp/11mh

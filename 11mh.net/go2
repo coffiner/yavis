@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# made of `HTTPie`
+
+. ./conf2
+
+HTTP="http --session=11mh --ignore-stdin"
+URLSIGN="http://www.11mh.net/plugin.php?id=dsu_paulsign:sign"
+URLSUF="&inajax=1"
+
+$HTTP "http://www.11mh.net/member.php?mod=logging&action=login" > /tmp/11mh
+LOGINHASH=`grep -m 1 -Po "(?<=username_)\w+(?=\")" /tmp/11mh`
+FORMHASH=`grep -m 1 -Po "(?<=formhash=).*?(?=\&)" /tmp/11mh`
+
+$HTTP -f POST "http://www.11mh.net/member.php?mod=logging&action=login&loginsubmit=yes&loginhash="$LOGINHASH$URLSUF \
+	formhash=$FORMHASH \
+	referer=$URLSIGN \
+	username=$USER11 \
+	password=$PASS11 \
+	questionid=0 \
+| grep -Po "(?<=欢迎您回来，).*?(?=，现在将转入登录前页面)"
+
+$HTTP $URLSIGN > /tmp/11mh
+FORMHASH=`grep -m 1 -Po "(?<=formhash=).*?(?=\&)" /tmp/11mh`
+
+$HTTP -f POST $URLSIGN"&operation=qiandao&infloat=1"$URLSUF \
+	formhash=$FORMHASH \
+	qdxq=kx \
+	qdmode=2 \
+	fastreply=0 \
+> /tmp/11mh
+
+grep -Po "敏捷.*?(?=\.)" /tmp/11mh || grep -Po "您今日已经签到，请明天再来！" /tmp/11mh

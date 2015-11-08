@@ -1,0 +1,1 @@
+curl --socks5-hostname 192.168.0.41 icanhazip.com

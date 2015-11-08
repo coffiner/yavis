@@ -1,0 +1,19 @@
+#!/bin/bash 
+
+echo $$ > /var/run/tunnel.pid
+
+while true
+do
+	sleep 10
+
+# check socks5 tunnel
+	curl -Ss --socks5-hostname 192.168.0.41 icanhazip.com | grep 2600:3c00::f03c && continue
+
+# tunnel broken
+	for i in `pidof ssh`
+	do
+		ps $i | grep '\-D 1080 -CfNg proxy@ln6' && kill $i
+	done
+	sshpass -p pppppp ssh -D 1080 -CfNg proxy@ln6
+done
+

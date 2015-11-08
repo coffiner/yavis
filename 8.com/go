@@ -1,0 +1,67 @@
+#!/bin/bash
+
+maindir=`pwd`
+urldir=$maindir/url
+targetdir=$maindir/site
+downdir=$maindir/down
+upcmd=~/pcs/bypy/bypy.py
+
+get8() {
+	wget -nc --accept-regex 'forum\/view' -mk -i $urldir/url -P $targetdir
+}
+
+grep8() {
+	grep -Phor "http:[^<>:]*?rar(?=<)" $targetdir | sort | uniq > $urldir/new
+}
+
+comm8() {
+	cd $urldir
+
+	sort old | uniq > tmp
+	cat tmp > old
+
+	sort new | uniq > tmp
+	cat tmp > new
+
+	rm tmp
+	comm -13 old new > real
+
+	cd $maindir
+}
+
+down8() {
+
+	for line in $(sed "s/ /%20/g" $urldir/real); do
+		axel -a -n 10 -o $downdir $line
+		$upcmd upload $downdir
+		rm $downdir/*
+	done
+
+	cat $urldir/real >> $urldir/old
+}
+
+case $1 in
+	wget)
+		get8
+		;;
+	grep)
+		grep8
+		;;
+	comm)
+		comm8
+		;;
+	down)
+		down8
+		;;
+	all)
+		get8
+		grep8
+		comm8
+		down8
+		;;
+	test)
+		$upcmd
+		;;
+	*)
+		echo "Usage: go {wget|grep|comm|down|all}"
+esac

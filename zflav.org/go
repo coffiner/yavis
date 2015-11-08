@@ -1,0 +1,5 @@
+#!/bin/bash
+
+u=`http "$1" | grep -Po "https://zflav.org/play\?src=.*?(?=\")"`
+u=`http "$u" | grep -Po "http://.*?(?=\" type=\'video/mp4)"`
+echo $u

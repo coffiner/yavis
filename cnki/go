@@ -1,0 +1,50 @@
+#!/bin/bash
+
+UTILS="./utils"
+
+[[ ! -d $UTILS ]] && echo "No utils dir ~" && exit 1
+[[ ! -f "./input" ]] && echo "No input file ~" && exit 1
+. $UTILS/conf
+
+[[ ! -d $TMP ]] && echo -n "Making tmp dir ... " && mkdir $TMP && echo "Done !"
+[[ ! -d $DOWN ]] && echo -n "Making down dir ... " && mkdir $DOWN && echo "Done !"
+
+date > $LOG
+
+cat input | while read line
+do
+	echo "" >> $LOG
+	i=$(urlencode $line)
+	echo "Start "$i >> $LOG
+
+	echo -n "Querying ... " >> $LOG
+	#curl -sS $qlink$i$qlinksuf -c $TMP/cookie -o $TMP/entry >> $LOG 2>&1
+	curl -sS $qlink$i -c $TMP/cookie -o $TMP/entry >> $LOG 2>&1
+	echo "Done ! " >> $LOG
+
+	echo -n "Analyzing ... " >> $LOG
+	grep -Phor -m 1 "http:.*?(caj|pdf)down" $TMP/entry > $TMP/link
+	n=`cat $TMP/link | wc -l`
+	echo "Done ! " >> $LOG
+
+	if [[ $n -eq 1 ]]
+	then
+		echo -n "Downloading ... " >> $LOG
+		curl -sSLi -b $TMP/cookie -e $qlink$i `cat $TMP/link` -o "$TMP/ofile" >> $LOG 2>&1
+		$UTILS/p $TMP/ofile
+		echo "Done !" >> $LOG
+	else
+		echo "Not found !!!" >> $LOG
+	fi
+
+	echo "Waiting for "$WAIT" sec ..." >> $LOG
+	sleep $WAIT
+done
+
+ls $DOWN -1 | iconv -f gb2312 -t utf8 > output
+
+echo "" >> $LOG
+echo "All done at "`date` >> $LOG
+
+exit 0
+

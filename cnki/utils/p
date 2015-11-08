@@ -1,0 +1,25 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+my $flag = 0;
+my $filename = 'tmpfile';
+
+open FILE,">./tmp/file" or die "make file wrong!";
+
+while(<>)
+{
+	if ( $flag == 0 ) {
+		m/(?: filename=)(.*?)\.(\w{3})/ and $filename = $1.".".$2 and $flag = 1;
+	} elsif ( $flag == 1 ) {
+		m/Connection: close/i and $flag = 2;
+	} elsif ( $flag == 3 ) {
+		print FILE ;
+	} else {
+		$flag += 1;
+	}
+}	
+
+close FILE;
+#print $filename."\n";
+rename "./tmp/file", "./down/".$filename;
