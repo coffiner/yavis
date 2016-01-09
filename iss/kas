@@ -1,0 +1,11 @@
+#!/bin/bash
+
+port=(3389 2000 2001 5900)
+
+for p in ${port[@]}
+do
+	st=`netstat -nalp | grep $p | grep CLOSE_WAIT`
+	[[ $? == "0" ]] && pid=`echo $st | grep -Po "(?<=\s)\d+(?=/sshd)"` && kill -2 $pid && date >> /var/log/iss
+done
+
+exit 0
