@@ -8,6 +8,7 @@ do
 	url=${line%\">*}
 	echo Starting: $name @ $url
 	echo "[$name]($url)" >> output
+	echo $name >> history
 
 	# get number
 	num=`./getnum $url`
@@ -24,4 +25,5 @@ do
 
 	echo >> output
 	echo End.
+	#sleep 1
 done

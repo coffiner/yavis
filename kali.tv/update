@@ -1,0 +1,14 @@
+#to do
+#!/bin/bash
+
+# output: a file contains new url
+
+cat history | sort | uniq > his.tmp
+cat his.tmp > history
+
+./getmainurl | while read line
+do
+	grep 
+	name=${line#*\">}
+	url=${line%\">*}
+done
