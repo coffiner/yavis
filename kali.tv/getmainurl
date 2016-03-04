@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# get the main page of tums
+#
+# input: tag page
+# output: main url + name
+
+. ./conf
+
+TAGU="https://www.kali.tv/tag/tumblr%E6%90%AC%E8%BF%90%E5%B7%A5"
+
+$HTTP $TAGU | grep -Po "https:\/\/www.kali.tv\/\d+\.html(\">)tumblr.*?\](?=<)" 

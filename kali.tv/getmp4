@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# analyse video page
+#
+# input: video page
+# output: mp4 url
+
+. ./conf
+
+u=`$HTTP "$1" | grep -Po "https://cdn.kali.tv/player/tumblr.php\?.*?(?=\")"`
+#://vt.tumblr.com/tumblr_nr1vcaYN3U1utopdc.mp4
+u=`$HTTP "$u" | grep -Pom 1 "https://.*?mp4"`
+echo $u

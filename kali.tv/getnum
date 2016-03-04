@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# find number of videos
+#
+# input: main url
+# output: an integer
+
+. ./conf
+
+v=`$HTTP "$1" | grep -Pom 1 "(?<=\[)\d+(?=V\])"`
+echo $v
