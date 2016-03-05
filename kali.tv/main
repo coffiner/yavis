@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# the main excutable
+#
 # output: a file contains mp4 url
 
 ./getmainurl | while read line
@@ -7,11 +9,10 @@ do
 	name=${line#*\">}
 	url=${line%\">*}
 	echo Starting: $name @ $url
-	echo "[$name]($url)" >> output
-	echo $name >> history
+	echo "$name $url" >> output
 
 	# get number
-	num=`./getnum $url`
+	num=`./getnum "$name"`
 	echo -n "Has $num videos. "
 
 	# analyse each page

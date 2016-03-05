@@ -1,13 +1,31 @@
 #!/bin/bash
 
-# analyse video page
+# analyse video page; this method is a little dirty!
 #
 # input: video page
 # output: mp4 url
 
 . ./conf
 
-u=`$HTTP "$1" | grep -Po "https://cdn.kali.tv/player/tumblr.php\?.*?(?=\")"`
-#://vt.tumblr.com/tumblr_nr1vcaYN3U1utopdc.mp4
-u=`$HTTP "$u" | grep -Pom 1 "https://.*?mp4"`
-echo $u
+for((try=0, suc=1; try<$MAX & suc!=0;try++))
+do
+	ret=`$HTTP "$1"`
+	$SLEEP
+	suc=$?
+done
+u=`echo $ret | grep -Po "https://cdn.kali.tv/player/tumblr.php\?.*?(?=\")"`
+
+for((try=0, suc=1; try<$MAX & suc!=0;try++))
+do
+	ret=`$HTTP $u`
+	$SLEEP
+	suc=$?
+done
+echo $ret > log
+grep -Pom 1 "https://.*?mp4" log > log2
+status=$?
+head -n 1 log2
+rm log log2
+exit $status
+#u=`echo $ret | grep -Pom 1 "https://.*?mp4"`
+#echo ${u% *}

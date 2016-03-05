@@ -2,10 +2,8 @@
 
 # find number of videos
 #
-# input: main url
+# input: name
 # output: an integer
 
-. ./conf
-
-v=`$HTTP "$1" | grep -Pom 1 "(?<=\[)\d+(?=V\])"`
-echo $v
+tmp=${1#*[}
+echo ${tmp%V*}

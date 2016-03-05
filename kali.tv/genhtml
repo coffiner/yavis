@@ -1,0 +1,22 @@
+#!/usr/bin/awk -f
+
+# generate html
+#
+# input: 'output'
+# output: a html contains all video links
+
+BEGIN {
+	prefix = "<video controls=\"controls\"><source src=\""
+	suffix = "\" type=\"video/mp4\" /></video>"
+	system("mv index.html index.html.bak")
+}
+{
+	if (NF == 1) {
+		match($1, "http.*?mp4")
+		if (RSTART != 0) {
+			print prefix $1 suffix >> "index.html"
+		}
+	}
+}
+END {
+}

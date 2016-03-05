@@ -7,6 +7,10 @@
 
 . ./conf
 
-TAGU="https://www.kali.tv/tag/tumblr%E6%90%AC%E8%BF%90%E5%B7%A5"
-
-$HTTP $TAGU | grep -Po "https:\/\/www.kali.tv\/\d+\.html(\">)tumblr.*?\](?=<)" 
+for((try=0, suc=1; try<$MAX & suc!=0;try++))
+do
+	ret=`$HTTP $TAGU`
+	suc=$?
+	$SLEEP
+done
+echo $ret | grep -Po "https:\/\/www.kali.tv\/\d+\.html(\">)tumblr.*?\](?=<)"
