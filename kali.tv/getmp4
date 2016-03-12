@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# analyse video page; this method is a little dirty!
+# analyse video page
 #
 # input: video page
 # output: mp4 url

@@ -1,9 +1,6 @@
 #!/usr/bin/awk -f
 
 # check missing trap in 'output'
-# 
-# input: 'output'
-# output: a new output and 'output.bak'
 
 BEGIN {
 	stat = 0

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# the main excutable
-#
 # output: a file contains mp4 url
 
 ./getmainurl | while read line
