@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# F**k off douyu !!!
+# by Jack
+# 2016年 04月 09日 星期六 19:33:07 CST
+
+START_URL="http://www.douyu.com/directory/all"
+CURL="curl -SsL"
+SLEEP="sleep 0.1"
+OUTPUT="douyu.csv"
+
+$CURL $START_URL | grep -PA 60 "classify" > tmp
+./checkindex tmp > douyu
+./genpage douyu > url
+[[ -d "data" ]] || mkdir data
+date > douyu
+echo 栏目,频道数,在线人数 >> douyu
+for dir in `cat url`
+do
+	echo Processing $dir ...
+	for url in `cat "."$dir"/url"`
+	do
+		$CURL $url > tmp
+		$SLEEP
+		# tag
+		grep -Po "(?<=tag ellipsis\">).*?(?=<\/span>)" tmp >> "."$dir"/tag"
+		# dy-name
+		grep -Po "(?<=dy-name ellipsis fl\">).*?(?=<\/span>)" tmp >> "."$dir"/dy-name"
+		# dy-num
+		grep -Po "(?<=dy-num fr\">).*?(?=<\/span>)" tmp >> "."$dir"/dy-num"
+	done
+	#./gendata "."$dir
+	./gendata2 "."$dir >> douyu
+done
+iconv -f utf8 -t GB18030 douyu > $OUTPUT
+rm tmp url douyu
+#tar zcf ./data/`date +'%y_%m_%d'`.tgz directory

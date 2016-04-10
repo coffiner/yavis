@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Mix the data together
+# By Jack
+# 2016年 04月 09日 星期六 20:40:52 CST
+
+exec 3<$1/dy-name
+exec 4<$1/dy-num
+echo `cat $1/name``date` > $1/data
+echo dy-name,dy-num,tag >> $1/data
+cat $1/tag | while read dytag
+do
+	read dyname <&3 
+	read dynum <&4 
+	echo $dyname,$dynum,$dytag >> $1/data
+done
+exec 3</dev/null
+exec 4</dev/null
+
+iconv -f utf8 -t GB18030 $1/data > $1/data.csv

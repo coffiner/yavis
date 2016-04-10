@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Generate data, 2nd ver.
+# By Jack
+# 2016年 04月 10日 星期日 14:19:31 CST
+
+dir=$1
+input=$dir/dy-num
+nam=`dos2unix $dir/name;cat $dir/name`
+cha=`wc -l $input | cut -d' ' -f 1`
+regex=万
+sum=0
+while read line
+do
+	if [[ "$line" =~ "$regex" ]]
+	then
+		adder=`echo ${line/$regex/}* 10000 | bc`
+	else
+		adder=$line
+	fi
+	sum=`echo  $sum + $adder | bc`
+done < $input
+echo $nam,$cha,$sum
+
