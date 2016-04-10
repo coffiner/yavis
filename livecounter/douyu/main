@@ -6,7 +6,7 @@
 
 START_URL="http://www.douyu.com/directory/all"
 CURL="curl -SsL"
-SLEEP="sleep 0.1"
+SLEEP="sleep 0.2"
 OUTPUT="douyu.csv"
 
 $CURL $START_URL | grep -PA 60 "classify" > tmp
@@ -35,3 +35,4 @@ done
 iconv -f utf8 -t GB18030 douyu > $OUTPUT
 rm tmp url douyu
 #tar zcf ./data/`date +'%y_%m_%d'`.tgz directory
+exit 0
