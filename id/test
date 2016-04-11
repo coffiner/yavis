@@ -1,0 +1,2 @@
+curl -SsL http://www.shenfenzhenghaodaquan.org/ \
+-H "User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36"
