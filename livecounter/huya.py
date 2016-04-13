@@ -7,6 +7,8 @@
 
 import urllib2 as ul, re, json, time
 
+sleep_time = 0.2
+
 data_url = 'http://www.huya.com/index.php?m=Game&do=ajaxGameLiveByPage&gid=GID&page=PAGE'
 print ','.join(['分类','时间','直播数目','在线人数'])
 
@@ -43,7 +45,7 @@ while gid_match_group:
         url = data_url
         url = url.replace('GID',gid).replace('PAGE',str(page))
         json_data = ul.urlopen( ul.Request(url)).read()
-        #time.sleep(0.02)
+        time.sleep(sleep_time)
         json_data = json.loads(json_data)
         total = json_data['data']['total']
         list = json_data['data']['list']
