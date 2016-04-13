@@ -42,7 +42,7 @@ def fk(cate, url):
 
 data_dic = {}
 act_url = 'http://www.yy.com/ent/index/pageLive.action'
-#print ','.join(['分类','时间','直播数目','在线人数'])
+print ','.join(['栏目','抓取时间','频道数','在线人数'])
 
 # check index
 index = 'http://www.yy.com'

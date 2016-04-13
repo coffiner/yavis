@@ -10,7 +10,7 @@ import urllib2 as ul, re, json, time
 sleep_time = 0.2
 
 data_url = 'http://www.huya.com/index.php?m=Game&do=ajaxGameLiveByPage&gid=GID&page=PAGE'
-print ','.join(['分类','时间','直播数目','在线人数'])
+print ','.join(['栏目','抓取时间','频道数','在线人数'])
 
 # check index
 index = 'http://www.huya.com/index'
