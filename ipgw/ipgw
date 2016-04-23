@@ -7,59 +7,62 @@
 [[ -z $pass ]] && echo "No password specified. Exit." && exit 0
 
 # pattern of return message
-par="(?<=<!--IPGWCLIENT_START).*?(?=IPGWCLIENT_END-->)"
+parno="(?<=<!--IPGWCLIENT_START).*?(?=IPGWCLIENT_END-->)"
+parls="(?<=class=td2>)[^()]*?(?=</td>)"
 
 CURLC="curl -sSL -c /tmp/cookie"
 CURLB="curl -sSL -b /tmp/cookie"
 
-# login, exit 1 if failed
-rm /tmp/cookie
-$CURLC "https://its.pku.edu.cn/cas/login" \
+login () {
+	$CURLB "https://its.pku.edu.cn/netportal/netportal_UTF-8.jsp" \
+| grep "系统超时或已经退出登录，请重新登录" > /dev/null || { return 0; } 
+	# login, exit 1 if failed
+	#echo login is needed
+	rm /tmp/cookie
+	$CURLC "https://its.pku.edu.cn/cas/login" \
 -d username1=$user -d password=$pass -d pwd_t=%E5%AF%86%E7%A0%81 -d fwrd=free -d username=\
 $user%7C%3BkiDrqvfi7d%24v0p5Fg72Vwbv2%3B%7C$pass%7C%3BkiDrqvfi7d%24v0p5Fg72Vwbv2%3B%7C12 \
 | sed "/Script\">/{n;/alert/q;}" | tail -n1 | grep alert && exit 1
+}
 
-case $1 in
-	"open")
-	action=open
-	;;
-	"close")
-	action=close
-	;;
-	"openall")
-	action=openall
-	;;
-	"closeall")
-	action=closeall
-	;;
-	*)
-	action=open
-	;;
-esac
+go() {
+	[[ -z "$1" ]] && { echo "cao"; exit 1; }
+	[[ -z "$2" ]] && { echo "nima"; exit 1; }
+	# do action
+	$CURLB "https://its.pku.edu.cn/netportal/ipgw$1?sid=500" -o /tmp/result
+	grep -Po $2 /tmp/result
+	grep "当前连接数超过预定值" /tmp/result > /dev/null || exit 0
+}
 
-# do action
-$CURLB "https://its.pku.edu.cn/netportal/ipgw$action?sid=500" -o /tmp/result
-grep -Po $par /tmp/result
-grep "当前连接数超过预定值" /tmp/result > /dev/null || exit 0
-
-# grep message
-grep -A 1 -P "messages" /tmp/result | sed "s/<.*\"//g" > /tmp/messages
-MESSAGE=`awk 'BEGIN{ORS="%0D%0A"}{print $0}' /tmp/messages`
-# get IPs
-$CURLB -d operation=get_disconnectip_err -d from=cas -d timeout=1 -d range=2 -d uid=$user -d messages="$MESSAGE" "https://its.pku.edu.cn/netportal/ipgw.ipgw" \
+recon() {
+	# grep message
+	grep -A 1 -P "messages" /tmp/result | sed "s/<.*\"//g" > /tmp/messages
+	MESSAGE=`awk 'BEGIN{ORS="%0D%0A"}{print $0}' /tmp/messages`
+	# get IPs
+	$CURLB -d operation=get_disconnectip_err -d from=cas -d timeout=1 -d range=2 -d uid=$user -d messages="$MESSAGE" "https://its.pku.edu.cn/netportal/ipgw.ipgw" \
 | grep -A 2 -P ">(\d+\.){3}\d+<" > /tmp/result
-cat /tmp/result
-# select ip
-while [[ "$n" != "1" && "$n" != "2" ]]
-do
-	echo "Input the order you want to close: "
-	read n
-done
-ip=`grep -Po "(\d+\.){3}\d+" result | sed -n $n'p'`
-# close IP
-$CURLB -d operation=disconnectip_err -d from=cas -d timeout=1 -d range=1 -d uid=$user -d disconnectip=$ip -d messages=$MESSAGE "https://its.pku.edu.cn/netportal/ipgw.ipgw" | grep -Po "(?<=td>)[^<]*?(?=<)"
+	cat /tmp/result
+	# select ip
+	while [[ "$n" != "1" && "$n" != "2" && "$n" != "3" ]]
+	do
+		echo "Input the order you want to close: "
+		read n
+	done
+	ip=`grep -Po "(\d+\.){3}\d+" /tmp/result | sed -n $n'p'`
+	# close IP
+	$CURLB -d operation=disconnectip_err -d from=cas -d timeout=1 -d range=2 -d uid=$user -d disconnectip=$ip -d messages=$MESSAGE "https://its.pku.edu.cn/netportal/ipgw.ipgw" | grep -Po "(?<=td>)[^<]*?(?=<)"
 
-# re-connect
-./ipgw open
-rm /tmp/result /tmp/messages
+	# re-connect
+	go open $parno
+}
+
+# OK, let's GO
+login
+action=$1
+par=$parno
+[[ -z $action ]] && action=onlineip && par=$parls
+go $action $par
+recon
+
+#rm /tmp/result /tmp/messages
 exit 0
