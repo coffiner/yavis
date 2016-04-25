@@ -1,23 +1,28 @@
 #!/bin/bash
 
+# A ipgwclient, by Jack
+# Mon Apr 25 14:34:39 CST 2016
+
+USAGE="$0 [COMMAND]\n\tCOMMAND={help|open|openall|close|closeall|onlineip}"
+
 # check $user and $pass
 [[ -f /etc/ipgwrc ]] && . /etc/ipgwrc
 [[ -f ~/.ipgwrc ]] && . ~/.ipgwrc
 [[ -z $user ]] && echo "No user specified. Exit." && exit 0
 [[ -z $pass ]] && echo "No password specified. Exit." && exit 0
 
-# pattern of return message
-parno="(?<=<!--IPGWCLIENT_START).*?(?=IPGWCLIENT_END-->)"
-parls="(?<=class=td2>)[^()]*?(?=</td>)"
-
 CURLC="curl -sSL -c /tmp/cookie"
 CURLB="curl -sSL -b /tmp/cookie"
+
+help () {
+	echo -e $USAGE
+}
 
 login () {
 	$CURLB "https://its.pku.edu.cn/netportal/netportal_UTF-8.jsp" \
 | grep "系统超时或已经退出登录，请重新登录" > /dev/null || { return 0; } 
 	# login, exit 1 if failed
-	#echo login is needed
+	echo Login is needed. 1>&2
 	rm /tmp/cookie
 	$CURLC "https://its.pku.edu.cn/cas/login" \
 -d username1=$user -d password=$pass -d pwd_t=%E5%AF%86%E7%A0%81 -d fwrd=free -d username=\
@@ -26,22 +31,44 @@ $user%7C%3BkiDrqvfi7d%24v0p5Fg72Vwbv2%3B%7C$pass%7C%3BkiDrqvfi7d%24v0p5Fg72Vwbv2
 }
 
 go() {
-	[[ -z "$1" ]] && { echo "cao"; exit 1; }
-	[[ -z "$2" ]] && { echo "nima"; exit 1; }
+	case $1 in
+		"help")
+			help
+			exit 0
+			;;
+		"open")
+			;;
+		"openall")
+			;;
+		"close")
+			;;
+		"closeall")
+			;;
+		"onlineip")
+			;;
+		*)
+			echo What are u doing with $1 ?
+			help
+			exit 3
+		;;
+	esac
 	# do action
+	echo Command is: $action ... 1>&2
 	$CURLB "https://its.pku.edu.cn/netportal/ipgw$1?sid=500" -o /tmp/result
-	grep -Po $2 /tmp/result
+	grep -Po "(?<=<!--IPGWCLIENT_START\W).*?(?=IPGWCLIENT_END-->)" /tmp/result\
+| sed "s/ /\n/" | sed "s/| /\n/g"
 	grep "当前连接数超过预定值" /tmp/result > /dev/null || exit 0
 }
 
 recon() {
+	echo Must disconnect first. 1>&2
 	# grep message
 	grep -A 1 -P "messages" /tmp/result | sed "s/<.*\"//g" > /tmp/messages
 	MESSAGE=`awk 'BEGIN{ORS="%0D%0A"}{print $0}' /tmp/messages`
 	# get IPs
 	$CURLB -d operation=get_disconnectip_err -d from=cas -d timeout=1 -d range=2 -d uid=$user -d messages="$MESSAGE" "https://its.pku.edu.cn/netportal/ipgw.ipgw" \
 | grep -A 2 -P ">(\d+\.){3}\d+<" > /tmp/result
-	cat /tmp/result
+	sed "s/\(<td.*2>\|<.td>\)//g" /tmp/result
 	# select ip
 	while [[ "$n" != "1" && "$n" != "2" && "$n" != "3" ]]
 	do
@@ -50,19 +77,23 @@ recon() {
 	done
 	ip=`grep -Po "(\d+\.){3}\d+" /tmp/result | sed -n $n'p'`
 	# close IP
-	$CURLB -d operation=disconnectip_err -d from=cas -d timeout=1 -d range=2 -d uid=$user -d disconnectip=$ip -d messages=$MESSAGE "https://its.pku.edu.cn/netportal/ipgw.ipgw" | grep -Po "(?<=td>)[^<]*?(?=<)"
+	$CURLB -d operation=disconnectip_err -d from=cas -d timeout=1 -d range=2 -d uid=$user -d disconnectip=$ip -d messages=$MESSAGE "https://its.pku.edu.cn/netportal/ipgw.ipgw"\
+| grep -Po "(?<=td>)[^<]*?(?=<)" | sed "s/&nbsp;//g"
+	echo
+	echo Reconnecting ...
+	echo 
 
 	# re-connect
-	go open $parno
+	go open $par
 }
 
 # OK, let's GO
 login
 action=$1
-par=$parno
-[[ -z $action ]] && action=onlineip && par=$parls
+[[ -z $action ]] && action=onlineip
 go $action $par
 recon
 
 #rm /tmp/result /tmp/messages
-exit 0
+echo It can not come there !!!
+exit 1
