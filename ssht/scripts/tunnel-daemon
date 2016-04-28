@@ -1,0 +1,22 @@
+#!/bin/bash 
+
+echo $$ > /var/run/ssht.pid
+
+. /etc/sshtrc
+
+while true
+do
+	$SLEEP
+
+# check socks5 tunnel
+	ssh $USER@$HOST ssh $USER@localhost -p $RPORT hostname | grep `hostname` >/dev/null && continue
+
+# tunnel broken
+	for i in `pidof ssh`
+	do
+		ps $i | grep $PAR && kill $i
+	done
+	echo reconn @" "`date`
+	ssh -CfNgR $RPORT:localhost:22 $USER@$HOST
+done
+

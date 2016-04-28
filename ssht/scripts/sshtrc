@@ -1,0 +1,8 @@
+# sleep time
+SLEEP="sleep 100"
+
+# remote config
+RPORT=12345
+USER=jack
+HOST=capu
+PAR='\-CfNgR 12345:localhost:22 jack@capu'

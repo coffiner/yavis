@@ -1,0 +1,5 @@
+#!/bin/bash
+
+install ./scripts/ssht /etc/init.d/
+install ./scripts/tunnel-daemon /usr/local/sbin/
+install ./scripts/sshtrc /etc/
