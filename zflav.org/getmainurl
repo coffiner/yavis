@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# get the main page of tums
+#
+# input: tag page
+# output: main url + name
+
+. ./conf
+
+for((try=0, suc=1; try<$MAX & suc!=0;try++))
+do
+	ret=`$HTTP $TAGU`
+	suc=$?
+	$SLEEP
+done
+echo $ret | grep -Po "https:\/\/www.kali.tv\/\d+\.html(\">)tumblr.*?\](?=<)"

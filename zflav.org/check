@@ -1,0 +1,55 @@
+#!/usr/bin/awk -f
+
+# check missing trap in 'output'
+
+BEGIN {
+	stat = 0
+	# 0: initial
+	# 1: data
+}
+{
+	if (stat == 0) {	# initial 2 data
+		if (NF == 0) {	# blank line
+
+		} else if (NF == 2) {	# get head 
+			name = $1
+			main_url = $2
+			i = 0
+			stat = 1
+			num = $1
+			sub(/^.*?\[/, "", num);
+			sub(/V\]/, "", num)
+			print "Start", name, num
+			print name, main_url >> "checkout"
+		} else {	# error occurs
+			print "Number of field error! Check line", FNR
+			exit 1
+		}
+	} else if (stat == 1) {		# data
+		i++
+		if (i - num == 1) {	# data 2 initial
+			stat = 0
+			print "Done."
+			print "" >> "checkout"
+		} else if (NF == 0) {	# missing data
+			print i, "missing.. "
+			fflush("")
+			"./getmp4 "main_url"/"i" >> checkout; echo $?" | getline;
+			if ($0 == 0) {	# success
+				print "Success !"
+			} else {	# failed
+				print "" >> "checkout"
+			}
+		} else if (NF == 1) {	# OK
+			printf("%d. ", i)
+			print $1 >> "checkout"
+		} else {	# error occurs
+			print "Number of field error at data! Check line", FNR
+			exit 1
+		}
+	}
+}
+END {
+	system("mv output output.bak")
+	system("mv checkout output")
+}

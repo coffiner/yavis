@@ -1,0 +1,5 @@
+HTTP="http --ignore-stdin"
+SLEEP="sleep 10"
+MAX=5
+TAGU="https://www.kali.tv/tag/tumblr%E6%90%AC%E8%BF%90%E5%B7%A5"
+

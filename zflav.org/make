@@ -1,0 +1,26 @@
+#!/usr/bin/awk -f
+
+# input: 'output'
+# output: a html
+
+BEGIN {
+	prefix = "<video controls=\"controls\" preload=\"meta\"><source src=\""
+	suffix = "\" type=\"video/mp4\" /></video>"
+	system("mv html html.bak; mkdir html; touch html/index.html")
+	i = 0
+}
+{
+	if (NF == 1) {
+		match($1, "http.*?mp4")
+		if (RSTART != 0) {
+			print prefix $1 suffix >> "html/"i".html"
+		}
+	}
+	if (NF == 2) {
+		i++
+		print "<a href=\"./index.html\">"$1"</a><br>" >> "html/"i".html"
+		print "<a href=\"./"i".html\">"$1"</a><br>" >> "html/index.html"
+	}
+}
+END {
+}

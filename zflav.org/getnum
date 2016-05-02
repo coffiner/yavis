@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# find number of videos
+#
+# input: name
+# output: an integer
+
+tmp=${1#*[}
+echo ${tmp%V*}

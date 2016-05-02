@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# output: a file contains mp4 url
+
+./getmainurl | while read line
+do
+	name=${line#*\">}
+	url=${line%\">*}
+	echo Starting: $name @ $url
+	echo "$name $url" >> output
+
+	# get number
+	num=`./getnum "$name"`
+	echo -n "Has $num videos. "
+
+	# analyse each page
+	for ((i=1;i<=$num;i++))
+	do
+		echo -n $i
+		mp4=`./getmp4 $url"/"$i`
+		echo $mp4 >> output
+		echo -n ". "
+	done
+
+	echo >> output
+	echo End.
+	#sleep 1
+done
