@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# auto connect
+
+num=`ps -ef | grep "ssh -C" | wc -l`
+if [ $num -ne "2" ]; then 
+    echo -ne `date`"\t" >> /var/log/ssht
+    echo "reconnect..." >> /var/log/ssht
+    killall ssh
+    sshpass -p 'sky' ssh -CfNg -R 2000:127.0.0.1:22 green@182.92.150.205
+    #sshpass -p 'sky' ssh -CfNg -R 2001:10.16.127.34:22 green@182.92.150.205
+    #sshpass -p 'sky' ssh -CfNg -R 3389:10.16.127.34:3389 green@182.92.150.205
+    #sshpass -p 'sky' ssh -CfNg -R 5900:10.16.127.34:5900 green@182.92.150.205
+fi
+
+exit 0

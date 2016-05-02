@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# keepalive to iss-web-auth, ping baidu.com
+# by Jack @ 2015.08.22
+
+ECHO=/bin/echo
+CURL=/usr/bin/curl
+GREP=/bin/grep
+DATE=/bin/date
+LOG=/var/log/ping
+
+$ECHO -n `$DATE +%D-%H:%M:%S`"   " >> $LOG
+$CURL -sS --socks5 localhost icanhazip.com >> $LOG
+
+exit 0

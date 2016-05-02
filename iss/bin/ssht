@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# auto connect
+
+killall ssh
+sshpass -p 'sky' ssh -CfNg -R 2000:127.0.0.1:22 green@182.92.150.205
+#sshpass -p 'sky' ssh -CfNg -R 2001:10.16.127.34:22 green@182.92.150.205
+#sshpass -p 'sky' ssh -CfNg -R 3389:10.16.127.34:3389 green@182.92.150.205
+#sshpass -p 'sky' ssh -CfNg -R 5900:10.16.127.34:5900 green@182.92.150.205

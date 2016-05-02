@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# keepalive to iss-web-auth
+# by Jack @ 2015.08.22
+
+ECHO=/bin/echo
+CURL=/usr/bin/curl
+GREP=/bin/grep
+DATE=/bin/date
+SLEEP=/bin/sleep
+LOG=/var/log/keepalive
+
+$CURL -sS --socks5 localhost icanhazip.com | $GREP -Po "(\d+\.){3}\d+" > /dev/null
+
+while [ $? != "0" ]
+do
+    $ECHO -n `$DATE +%D-%H:%M:%S`"   " >> $LOG
+    u=`curl -sSL -d "username=yyjif" -d "userpwd=qwerty%4041" -d "btlogin=%E7%99%BB%E5%BD%95" --socks5 localhost "http://10.16.248.2/cgi-bin/ace_web_auth.cgi?web_jumpto=&orig_referer=" | $GREP -Po "(?<=\"/)login.*(?=\")"`
+    $CURL -sS --socks5 localhost "http://10.16.248.2/"$u | $GREP -Po "(?<=>)yyjif.*?yyjif" >> $LOG
+    $SLEEP 30
+    $CURL -sS --socks5 localhost icanhazip.com | $GREP -Po "(\d+\.){3}\d+" > /dev/null
+done
+
+exit 0

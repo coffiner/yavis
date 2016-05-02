@@ -1,0 +1,8 @@
+#!/bin/bash
+
+LOG=/var/log/test
+
+w=`who | grep -P "^[^j]"`
+[[ $w != "" ]] && echo `date`"    "$w >>$LOG 
+
+exit 0

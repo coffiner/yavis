@@ -1,0 +1,8 @@
+#!/bin/bash
+# keep alive
+
+echo -n `date` >> /var/log/alive
+echo -ne "\tresult :\t" >> /var/log/alive
+sshpass -p ' ' ssh jack@182.92.150.205 sshpass -p Daokoo123 ssh -p 2001 administrator@127.0.0.1 date /T | iconv -f gb2312 -t utf8 >> /var/log/alive
+
+exit 0

@@ -7,7 +7,7 @@
 
 import urllib2 as ul, urllib, re, json, time
 
-sleep_time = 0.2
+sleep_time = 1
 ent_url = 'http://www.yy.com/ent/index/pageLive.action'
 t_url = 'http://www.yy.com/more/page.action?biz=BBB&subBiz=idx&page=PPP&moduleId=MMM'
 
